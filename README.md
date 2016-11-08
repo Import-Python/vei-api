@@ -31,7 +31,7 @@ $name = $vei->getRealname(); //Get the user realname and store it.
 ```
 Also below is the purchase data from the XLSX file they allow for download.
 * The first parameter, **URL_ID** its usually found with the storemanager: 
-*     https://portal.veinternational.org/storemanager/<<URL_ID>>/[OTHER LINK]/
+   >https://portal.veinternational.org/storemanager/<URL_ID>/[OTHER LINK]/
 * The other two are dates, **START_DATE** & **END_DATE**, which need to have the format of date like: *MM/DD/YEAR* or for example **03/09/2016** to **11/13/2016** 
 
 ```php
