@@ -12,7 +12,7 @@
 
 /*****************IMPORT ALL LIBRARIES************************/
 
-require_once __DIR__ . '/composer/vendor/autoload.php';
+require_once __DIR__ . '/lib/vendor/autoload.php';
 
 use Goutte\Client;
 use Box\Spout\Reader\ReaderFactory;

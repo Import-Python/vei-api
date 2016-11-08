@@ -1,0 +1,7 @@
+{
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "fabpot/goutte": "^3.1",
+        "box/spout": "^2.7"
+    }
+}
