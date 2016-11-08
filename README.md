@@ -23,15 +23,15 @@ Composer is not supported but feel free to use composer on all listed in require
 
 ---
 # Usage
-Realname of the user would be accessed by:
+To get the users real name with their credentials you would want to use:
 ```php
 require_once __DIR__ . '/veiAPI.php'; //Require the lib, the path may differ
 vei = new VEI(); //Initilize the VEI API
 $vei->setCredentials('USERNAME', 'PASSWORD'); //Set users credentials.
 $name = $vei->getRealname(); //Get the user realname and store it.
 ```
-Also below is the purchase data from the XLSX file they allow for download.
-* The first parameter, **URL_ID** its usually found with the storemanager:  
+Also below is the purchase data from the XLSX file from the **storemanager** thats for download:
+* The first parameter, **URL_ID** its usually found within the storemanager:  
   **portal.veinternational.org/storemanager/[URL_ID]/.../**
 * The other two are dates, **START_DATE** & **END_DATE**, which need to have the format of date like: *MM/DD/YEAR* or for example **03/09/2016** to **11/13/2016** 
 
@@ -87,8 +87,12 @@ I personally used it for getting the user **realname** and then compare the data
 
 # Upcoming Features:
 * Allow for **promotional codes** to be created and removed (storemanager)
+* Download all direct deposited money?
+* Attendence tracking?
+* Overall statics of the portal?
+
 # About
-Use at your own risk. When using user credentials for authentication, please use with respect. (meaning don't password shouldn't be saved)
+Use at your own risk. If attemping to authenticate users, don't steal passwords and money from the virtual bank.
 
 
 [//]: # (These are reference links used in the body of this note and get stripped out when the markdown processor does its job. There is no need to format nicely because it shouldn't be seen. Thanks SO - http://stackoverflow.com/questions/4823468/store-comments-in-markdown-syntax)
