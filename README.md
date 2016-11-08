@@ -11,7 +11,7 @@ VEI-API  uses a few open source projects to work properly:
 
 VEI-API requires [PHP](http://php.net) v5.6+ to execute.  
 
-There is a folder called **lib** which contains the composer files I downloaded and  used.  
+There is a folder called **lib** which contains the composer files I downloaded and used.  
 >Also in **lib\vendor\guzzlehttp\guzzle\src\Handler\CurlFactory.php** on like 78, **curl_reset($resource)** was removed because of a PHP version error. This may or may not needed to be removed based on your PHP version. 
 
 ## Installation
@@ -21,6 +21,7 @@ Install the folder into a directory on your server you wish to use.
 
 Composer is not supported but feel free to use composer on all listed in requirements.
 
+---
 # Usage
 Realname of the user would be accessed by:
 ```php
@@ -30,9 +31,10 @@ $vei->setCredentials('USERNAME', 'PASSWORD'); //Set users credentials.
 $name = $vei->getRealname(); //Get the user realname and store it.
 ```
 Also below is the purchase data from the XLSX file they allow for download.
-* The first parameter, **URL_ID** its usually found with the storemanager: 
-   >https://portal.veinternational.org/storemanager/<URL_ID>/[OTHER LINK]/
+* The first parameter, **URL_ID** its usually found with the storemanager:  
+  **porveinternational.org/storemanager/[URL_ID]/.../**
 * The other two are dates, **START_DATE** & **END_DATE**, which need to have the format of date like: *MM/DD/YEAR* or for example **03/09/2016** to **11/13/2016** 
+
 
 ```php
 require_once __DIR__ . '/veiAPI.php'; //Require the lib, the path differ
@@ -78,6 +80,7 @@ When using the ExcelData functions, you get this data (in JSON only for readabli
   }
 }
 ```
+---
 # Practical Uses
 
 I personally used it for getting the user **realname** and then compare the data to role out a automatic reminding system to make sure the pay monthly fees. (I sold Apartments for my firm)
