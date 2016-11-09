@@ -32,7 +32,7 @@ class VEI {
   private $status = false; //Status if user is signed in or not
   
   /*
-    THIS SETS THE CREDIENTS OF THE USER
+    THIS SETS THE CREDENTAILS OF THE USER
     @param Username is the name used for signing in to the portal.
     @param Password is a password... Not much to explain here.
   */
@@ -176,9 +176,8 @@ class VEI {
     return $data;
   }
   /*
-    THIS SETS THE CREDIENTS OF THE USER
-    @param Username is the name used for signing in to the portal.
-    @param Password is a password... Not much to explain here.
+    YESTERDAY'S PURCHASES
+    @param url_id for the portal id
   */
   public function getExcelDataYesterday($url_id) {
     $date = new DateTime();
@@ -187,6 +186,10 @@ class VEI {
     $data = $this->getExcelDataCustom($url_id, $yesterday, $yesterday);
     return $data;
   }
+  /*
+    TODAY'S PURCHASES
+    @param url_id for the portal id
+  */
    public function getExcelDataToday($url_id) {
     $date = new DateTime();
     $date->add(DateInterval::createFromDateString('today'));
