@@ -1,13 +1,13 @@
-<?php 
- /* 
- __      ________ _____             _____ _____ 
+<?php
+ /*
+ __      ________ _____             _____ _____
  \ \    / /  ____|_   _|      /\   |  __ \_   _|
-  \ \  / /| |__    | |______ /  \  | |__) || |  
-   \ \/ / |  __|   | |______/ /\ \ |  ___/ | |  
-    \  /  | |____ _| |_    / ____ \| |    _| |_ 
+  \ \  / /| |__    | |______ /  \  | |__) || |
+   \ \/ / |  __|   | |______/ /\ \ |  ___/ | |
+    \  /  | |____ _| |_    / ____ \| |    _| |_
      \/   |______|_____|  /_/    \_\_|   |_____|
         by Brendan Fuller (c) (2016)
-                                     
+
 */
 
 /*****************IMPORT ALL LIBRARIES************************/
@@ -26,11 +26,11 @@ use Box\Spout\Common\Type;
    Welcome to the main class!
 */
 class VEI {
-  
+
   public $user; //Username
   private $pass; //Password
   private $status = false; //Status if user is signed in or not
-  
+
   /*
     THIS SETS THE CREDENTAILS OF THE USER
     @param Username is the name used for signing in to the portal.
@@ -40,72 +40,126 @@ class VEI {
     $this->user = $username;
     $this->pass = $password;
     $this->status = true;
-  } 
+  }
   /*
-    THIS RETEIVES THE USERS REAL NAME. IT USES A TECHNIC OF WEB CRAW LOGIN
-    THEN GET THE TEXT FROM A BUTTON AND REMOVE USLESS CHARACTERS.
+    THIS RETEIVES THE USERS INFO FOR USE IN OTHER FUNCTION
   */
-  public function getRealname() {
+  private function getFirmInfo() {
     /* Checks if credentials have been set*/
     if ($this->status == false) {
       return false; //Returns false for invaild credentials
-    }  
-    
-    $nameNode = '#account_actions > .btn'; //Its what is used to grab the name in HTML Scrapping
-    
-    $client = new Client(); //Create a new Goutte Client    
-    $crawler = $client->request('GET', 'https://portal.veinternational.org/login/'); //Request the website to visit 
+    }
+
+    $userNode = '#user_section > b'; //Its what is used to grab the name in HTML Scrapping
+
+    $client = new Client(); //Create a new Goutte Client
+    $crawler = $client->request('GET', 'https://portal.veinternational.org/login/'); //Request the website to visit
     $form = $crawler->selectButton('Sign in')->form(); //Find the form to login with
     $crawler = $client->submit($form, array('username' => ($this->user), 'password' => $this->pass)); //Set credentials and submit
-
-    $name = $crawler->filter($nameNode)->each(function ( $node, $i) { //Grab the data (from the main portal page usually)
-        /*
-          This below successfully retrieves the REAL NAME of the user.
-          Without substr, the username would be for example
-            BRENDAN FULLER TOGGLE DROPDOWN
-          This is because the HTML Code for the main portal page is not id based,
-          so everything is classes, making it difficult to understand.
-          Adding the substring, with 24 (random guess to be honest) fixed it.
-        */
-        return substr($node->text(), 0, strlen($node->text()) - 24);  
+    try {
+        $link = $crawler->selectLink('Firm bank account')->link();
+    } catch (InvalidArgumentException $e) {
+     return null; 
+    }
+    $crawler = $client->click($link);
+    $data = $crawler->filter($userNode)->each(function ( $node, $i) { //Grab the data (from the bank page)
+        return $node->text();;
     });
-    if ($name[0] != "" || $name[0] != null) {
-        return $name[0]; //Return with real name
-    } else {
-        return null; //Return null if invaild username
-    }  
+    return $data[0];
+  }
+  private function getBankInfo() {
+    /* Checks if credentials have been set*/
+    if ($this->status == false) {
+      return false; //Returns false for invaild credentials
+    }
+
+    $userNode = '#user_section > b'; //Its what is used to grab the name in HTML Scrapping
+
+    $client = new Client(); //Create a new Goutte Client
+    $crawler = $client->request('GET', 'https://portal.veinternational.org/login/'); //Request the website to visit
+    $form = $crawler->selectButton('Sign in')->form(); //Find the form to login with
+    $crawler = $client->submit($form, array('username' => ($this->user), 'password' => $this->pass)); //Set credentials and submit
+    try {
+        $link = $crawler->selectLink('Your personal bank account')->link();
+    } catch (InvalidArgumentException $e) {
+     return null; 
+    }
+    $crawler = $client->click($link);
+    $data = $crawler->filter($userNode)->each(function ( $node, $i) { //Grab the data (from the bank page)
+        return $node->text();;
+    });
+    return $data[0];
+  }
+  /*
+    GET USERS NAME
+  */
+  public function getRealname() {
+    $user = $this->getFirmInfo(); //Get info
+    $user = explode(" (", $user); //Split at middle
+    $name = $user[0]; //Set array to needed notation
+    if (empty($name)) {
+       $name = $this->getBankInfo(); //Get info
+    }
+    return $name; //Remove front character
+
+    
+  }
+   /*
+    GET COMPANY THE USER WORKS FOR
+  */
+  public function getCompany() {
+    $user = $this->getFirmInfo(); //Get info
+    $user = getStringAfterChar($user, "(", 0); //Strip name
+    $user = explode(" - PF Code ", $user); //Split at middle
+    $company = $user[0]; //Set array to needed notation
+
+    return substr($company, 1); //Remove front character
+
+    
+  }
+  /*
+    GET THE ID OF THE USERS COMPANY
+  */
+  public function getCompanyID() { 
+    $user = $this->getFirmInfo(); //Get info
+    $user = getStringAfterChar($user, "(", 0); //Strip name off
+    $user = explode(" - PF Code ", $user); //Split at middle
+    $companyid = $user[1]; //Set array to needed notation
+
+    return substr($companyid, 0, strlen($companyid)- 1); //Remove last character
+  
   }
   
   /*
     THIS GET ALL PURCHASES BASED ON DATE RANGE AND URL ID (store manager)
-    
+
     @param URL_ID is the id of the storemanager give to all firms. VVVVVVVVV
     @param Start Date is a date in this format: MONTH/DAY/YEAR eg: 09/05/16 (all numbers need to be double digits too)
     @param End Date is same as start date but can be before start date, mus be after.
-    
+
     @URL-EXAMPLE w/ Random Date:
     https://portal.veinternational.org/storemanager/<<< ID IS RIGHT HERE>>>/salestransactions/xl/?sd=07/31/2016&ed=10/31/2016';
-    
+
     @NOTICE
     - This is usally ran once a day, to update database and such. Keep in mind an IP Address could be block for excessive requests.
     - Also it save to a file called vei.xlsx (and may create it if not there). This happens everytime a getExcel function is request.
       meaning you should limit how much you use it. (Once per 12 hours or once per day)
   */
-   
+
   public function getExcelDataCustom($url_id, $start_date, $end_date) {
     /* Checks if credentials have been set*/
     if ($this->status == false) {
       return false; //Returns false for invaild credentials
     }
-    $client = new Client(); //Create a new Guotte Client    
-    $crawler = $client->request('GET', 'https://portal.veinternational.org/login/'); //Request the website to visit 
+    $client = new Client(); //Create a new Guotte Client
+    $crawler = $client->request('GET', 'https://portal.veinternational.org/login/'); //Request the website to visit
     $form = $crawler->selectButton('Sign in')->form(); //Find the form to login with
     $crawler = $client->submit($form, array('username' => ($this->user), 'password' => $this->pass)); //Set credentials and submit
-    
+
     /*
       Instead of getting a realname, we want to get some file contents.
-      This here gets the contents of the excel file (xlsx) 
-    
+      This here gets the contents of the excel file (xlsx)
+
     */
     $download = 'https://portal.veinternational.org/storemanager/' . $url_id . '/salestransactions/xl/?sd=' . $start_date .'&ed=' . $end_date;
     $client->request('GET', $download);
@@ -130,7 +184,7 @@ class VEI {
     $sheet_num = 0; //
     $row_num = 0;
     $data = Array();
-    
+
     foreach ($reader->getSheetIterator() as $sheet) {
         $sheet_num = $sheet_num + 1;
         $row_num = 0;
