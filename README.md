@@ -23,12 +23,14 @@ Composer is not supported but feel free to use composer on all listed in require
 
 ---
 # Usage
-To get the users real name with their credentials you would want to use:
+To get the users real name or other user based data with their credentials you would want to use:
 ```php
 require_once __DIR__ . '/veiAPI.php'; //Require the lib, the path may differ
 vei = new VEI(); //Initilize the VEI API
 $vei->setCredentials('USERNAME', 'PASSWORD'); //Set users credentials.
 $name = $vei->getRealname(); //Get the user realname and store it.
+$company = $vei->getCompany(); //Get the user company name. REQUIRES user to have FIRM BANK enabled on account.
+$comoany_id = $vei->getCompanyID(); //Get the user company id. REQUIRES user to have FIRM BANK as well.
 ```
 Also below is the purchase data from the XLSX file from the **storemanager** thats for download:
 * The first parameter, **URL_ID** its usually found within the storemanager:  
